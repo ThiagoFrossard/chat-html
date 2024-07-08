@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        img {
+            height: 120px;
+            width: 300px;
+            padding: 20px;
+        }
+        .input-container {
+            border-radius: 5px;
+            outline: auto;
+            outline-color: #542B72;
+            height: 50px;
+            width: 40%;
+            display: flex;
+            margin-top: 10px;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 5px;
+            border: 1px;
+            border-color: #542B72;
+            border-radius: 5px;
+            outline: none;
+        }
+        .button {
+            margin-top: 50px;
+            background-color: #542B72;
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+            cursor: pointer;
+        }
+        .link {
+            color: #542B72;
+            margin-top: 30px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <img src="./assets/LogoSinapse.png" alt="Logo Sinapse">
+        <div id="email-container" class="input-container" style="display: none;">
+            <input type="email" id="email" placeholder="Email">
+        </div>
+        <div id="login-container" class="input-container">
+            <input type="text" id="login" placeholder="Login">
+        </div>
+        <div id="senha-container" class="input-container">
+            <input type="password" id="senha" placeholder="Senha">
+        </div>
+        <div id="acessar-btn" class="button" onclick="acessarChat()">Acessar</div>
+        <div id="redefinir-btn" class="button" onclick="redefinirSenha()" style="display: none;">Redefinir</div>
+        <div class="link" id="esqueceu-link" onclick="toggleEsqueceu()">Esqueceu sua senha?</div>
+    </div>
+    <script>
+        let esqueceu = false;
+
+        function toggleEsqueceu() {
+            esqueceu = !esqueceu;
+            document.getElementById('email-container').style.display = esqueceu ? 'flex' : 'none';
+            document.getElementById('login-container').style.display = esqueceu ? 'none' : 'flex';
+            document.getElementById('senha-container').style.display = esqueceu ? 'none' : 'flex';
+            document.getElementById('acessar-btn').style.display = esqueceu ? 'none' : 'block';
+            document.getElementById('redefinir-btn').style.display = esqueceu ? 'block' : 'none';
+            document.getElementById('esqueceu-link').textContent = esqueceu ? 'Voltar' : 'Esqueceu sua senha?';
+        }
+
+        function acessarChat() {
+            const login = document.getElementById('login').value;
+            const senha = document.getElementById('senha').value;
+            const xhr = new XMLHttpRequest();
+            const method = "POST";
+            const url = `https://hibou.makerplanet.com/sinapse/login.rule?sys=SIP&email=${login}&senha=${senha}`;
+
+            xhr.open(method, url, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.mensagem !== "false") {
+                        const params = new URLSearchParams(response).toString();
+                        window.location.href = `chat.html?${params}`;
+                    } else {
+                        alert("Login ou senha incorretos");
+                    }
+                } else if (xhr.readyState === XMLHttpRequest.DONE) {
+                    alert("Login ou senha incorretos");
+                }
+            };
+            xhr.send();
+        }
+
+        function redefinirSenha() {
+            const email = document.getElementById('email').value;
+            fetch(`https://hibou.makerplanet.com/sinapse/senha.rule?sys=SIP&email=${email}`)
+                .then(response => response.json())
+                .then(json => alert("Redefinir"))
+                .catch(() => alert("Erro"));
+        }
+    </script>
+</body>
+</html>
