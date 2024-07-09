@@ -4,56 +4,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Example</title>
+    <title>Chat</title>
     <style>
-        /* styles.css */
-        body,
-        html {
+        body {
             margin: 0;
-            padding: 0;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             font-family: Arial, sans-serif;
-        }
-
-        .container {
             display: flex;
             height: 100vh;
-            width: 100vw;
         }
 
-        #chat-screen,
-        #chat-screen2 {
+        .sidebar {
+            width: 30%;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-list {
             flex: 1;
-            border: 1px solid #ccc;
-            padding: 20px;
             overflow-y: auto;
         }
 
-        #chat-screen {
-            background-color: #f0f0f0;
-            width: 25%;
-            border-right: 1px solid #f2f2f2;
+        .chat-list-item {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
         }
 
-        #chat-screen2 {
-            background-color: #e0e0e0;
+        .chat-list-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .chat-list-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .chat-list-item .chat-info {
+            flex: 1;
+        }
+
+        .chat-list-item .chat-info .chat-name {
+            font-weight: bold;
+        }
+
+        .chat-list-item .chat-info .chat-last-message {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 15px;
+            background-color: #eee;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .chat-header .chat-name {
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+        }
+
+        .chat-message .message-content {
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 60%;
+        }
+
+        .chat-message.sent .message-content {
+            background-color: #542B72;
+            align-self: flex-end;
+        }
+
+        .chat-message.received .message-content {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            align-self: flex-start;
+        }
+
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .chat-input button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #542B72;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover {
+            background-color: #542B72;
         }
     </style>
-</head>
-
-<body>
-    <div class="container">
-        <div id="chat-screen"></div>
-        <div id="chat-screen2"></div>
-    </div>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <script>
-        // script.js
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAOet6ztiBd15SJ7GhZS6WH1tBd8q9-cOo",
             authDomain: "sinapse-neurocare-53ffc.firebaseapp.com",
@@ -64,101 +151,162 @@
             measurementId: "G-0PLBNLT4HE",
             databaseURL: "https://sinapse-neurocare-53ffc-default-rtdb.firebaseio.com/"
         };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        // Inicializar Firebase
+        const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const storage = firebase.storage();
+    </script>
+</head>
 
-        document.addEventListener('DOMContentLoaded', async function () {
-            const chatScreen = document.getElementById('chat-screen');
-            const chatScreen2 = document.getElementById('chat-screen2');
-            const userId = "someUserId";  // Replace with the actual user ID
+<body>
+    <div class="sidebar">
+        <div class="chat-list">
+            <div class="chat-list-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div class="chat-info">
+                    <div class="chat-name">João</div>
+                    <div class="chat-last-message">Última mensagem...</div>
+                </div>
+            </div>
+            <div class="chat-list-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div class="chat-info">
+                    <div class="chat-name">Maria</div>
+                    <div class="chat-last-message">Última mensagem...</div>
+                </div>
+            </div>
+            <div class="chat-list-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div class="chat-info">
+                    <div class="chat-name">João</div>
+                    <div class="chat-last-message">Última mensagem...</div>
+                </div>
+            </div>
+            <div class="chat-list-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div class="chat-info">
+                    <div class="chat-name">Maria</div>
+                    <div class="chat-last-message">Última mensagem...</div>
+                </div>
+            </div>
+            <div class="chat-list-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div class="chat-info">
+                    <div class="chat-name">João</div>
+                    <div class="chat-last-message">Última mensagem...</div>
+                </div>
+            </div>
+            <div class="chat-list-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div class="chat-info">
+                    <div class="chat-name">Maria</div>
+                    <div class="chat-last-message">Última mensagem...</div>
+                </div>
+            </div>
+            <div class="chat-list-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div class="chat-info">
+                    <div class="chat-name">João</div>
+                    <div class="chat-last-message">Última mensagem...</div>
+                </div>
+            </div>
+            <div class="chat-list-item">
+                <img src="https://via.placeholder.com/40" alt="User Image">
+                <div class="chat-info">
+                    <div class="chat-name">Maria</div>
+                    <div class="chat-last-message">Última mensagem...</div>
+                </div>
+            </div>
+            <!-- Adicione mais itens de chat aqui -->
+        </div>
+    </div>
+    <div class="chat-window">
+        <div class="chat-header">
+            <img src="https://via.placeholder.com/40" alt="User Image">
+            <div class="chat-name">Nome do Contato</div>
+        </div>
+        <div class="chat-messages">
+            <div class="chat-message sent">
+                <div class="message-content">Mensagem enviada</div>
+            </div>
+            <div class="chat-message received">
+                <div class="message-content">Mensagem recebida</div>
+            </div>
+            <!-- Adicione mais mensagens aqui -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Digite uma mensagem...">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
 
-            let chats = [];
-            let chatScreen2State = '';
-            let chatScreen2Type = '';
+    <script>
+        const chatList = document.getElementById('chatList');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatHeader = document.getElementById('chatHeader');
+        const messageInput = document.getElementById('messageInput');
+        let currentChatId = null;
 
-            function handleStateChange(newState, newType) {
-                chatScreen2State = newState;
-                chatScreen2Type = newType;
-                updateChatScreen2();
-            }
-
-            function updateChatScreen2() {
-                chatScreen2.textContent = `State: ${chatScreen2State}, Type: ${chatScreen2Type}`;
-            }
-
-            async function fetchImage() {
-                const storageRef = storage.ref(`Perfil/${userId}/`);
-                const files = await storageRef.listAll();
-                if (files.items.length > 0) {
-                    const imageUrl = await files.items[0].getDownloadURL();
-                    const imgElement = document.createElement('img');
-                    imgElement.src = imageUrl;
-                    imgElement.style.width = '40px';
-                    imgElement.style.height = '40px';
-                    imgElement.style.borderRadius = '50%';
-                    chatScreen.appendChild(imgElement);
-                }
-            }
-
-            await fetchImage();
-
-            const messagesRef = database.ref('talk');
-            const groupsRef = database.ref('group');
-
-            messagesRef.on('child_added', snapshot => {
-                const data = snapshot.val();
-                if (data.user1.cod === userId || data.user2.cod === userId) {
-                    chats.push(data);
-                    renderChats();
-                }
-            });
-
-            messagesRef.on('child_changed', snapshot => {
-                const data = snapshot.val();
-                if (data.user1.cod === userId || data.user2.cod === userId) {
-                    const index = chats.findIndex(chat => chat.id === data.id);
-                    if (index !== -1) {
-                        chats[index] = data;
-                        renderChats();
-                    }
-                }
-            });
-
-            groupsRef.on('child_added', snapshot => {
-                const data = snapshot.val();
-                if (data.members.some(member => member.member.cod === userId)) {
-                    chats.push(data);
-                    renderChats();
-                }
-            });
-
-            groupsRef.on('child_changed', snapshot => {
-                const data = snapshot.val();
-                if (data.members.some(member => member.member.cod === userId)) {
-                    const index = chats.findIndex(chat => chat.id === data.id);
-                    if (index !== -1) {
-                        chats[index] = data;
-                        renderChats();
-                    }
-                }
-            });
-
-            function renderChats() {
-                chatScreen.innerHTML = '';
-                chats.sort((a, b) => b.lastMessage.timestamp - a.lastMessage.timestamp);
-                chats.forEach(chat => {
-                    const chatElement = document.createElement('div');
-                    chatElement.textContent = chat.lastMessage.message;
-                    chatElement.addEventListener('click', () => handleStateChange(chat.id, chat.tipo));
-                    chatScreen.appendChild(chatElement);
+        function loadChats() {
+            database.ref('chats').on('value', (snapshot) => {
+                chatList.innerHTML = '';
+                snapshot.forEach((chatSnapshot) => {
+                    const chatId = chatSnapshot.key;
+                    const chatData = chatSnapshot.val();
+                    const chatItem = document.createElement('div');
+                    chatItem.classList.add('chat-list-item');
+                    chatItem.innerHTML = `
+                        <img src="${chatData.image}" alt="User Image">
+                        <div class="chat-info">
+                            <div class="chat-name">${chatData.name}</div>
+                            <div class="chat-last-message">${chatData.lastMessage}</div>
+                        </div>
+                    `;
+                    chatItem.onclick = () => selectChat(chatId, chatData.name, chatData.image);
+                    chatList.appendChild(chatItem);
                 });
+            });
+        }
+
+        function selectChat(chatId, chatName, chatImage) {
+            currentChatId = chatId;
+            chatHeader.innerHTML = `
+                <img src="${chatImage}" alt="User Image">
+                <div class="chat-name">${chatName}</div>
+            `;
+            loadMessages(chatId);
+        }
+
+        function loadMessages(chatId) {
+            chatMessages.innerHTML = '';
+            database.ref(`messages`).on('value', (snapshot) => {
+                chatMessages.innerHTML = '';
+                snapshot.forEach((messageSnapshot) => {
+                    const messageData = messageSnapshot.val();
+                    const messageItem = document.createElement('div');
+                    messageItem.classList.add('chat-message');
+                    messageItem.classList.add(messageData ? 'sent' : 'received');
+                    messageItem.innerHTML = `<div class="message-content">${messageData.text}</div>`;
+                    chatMessages.appendChild(messageItem);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+
+        function sendMessage() {
+            if (currentChatId && messageInput.value.trim() !== '') {
+                const messageText = messageInput.value.trim();
+                const newMessageRef = database.ref(`messages`).push();
+                newMessageRef.set({
+                    text: messageText,
+                    sent: true,  // Aqui você pode ajustar conforme necessário
+                    timestamp: Date.now()
+                });
+                database.ref(`lastMessage`).set(messageText);
+                messageInput.value = '';
             }
-        });
+        }
 
-
+        loadChats();
     </script>
 </body>
 
